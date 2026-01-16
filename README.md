@@ -2,11 +2,15 @@
 
 <div align="center">
 
+![Version](https://img.shields.io/badge/version-1.0.0-brightgreen?style=for-the-badge)
 ![Outline](https://img.shields.io/badge/Outline-VPN-green?style=for-the-badge)
 ![Shadowsocks](https://img.shields.io/badge/Shadowsocks-Proxy-blue?style=for-the-badge)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.11-yellow?style=for-the-badge&logo=python)
 
 **VPN сервер для доступа к российским ресурсам из-за рубежа**
+
+[Установка](#-быстрая-установка) • [Telegram Bot](#-telegram-bot) • [Клиенты](#-клиенты) • [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -18,12 +22,15 @@
 
 - 🚀 **Быстрая установка** — один скрипт, 2 минуты
 - 🔐 **Shadowsocks** — современный протокол, сложно заблокировать
+- 🤖 **Telegram Bot** — автоматическая выдача ключей пользователям
 - 📱 **Кроссплатформенность** — iOS, Android, Windows, macOS, Linux
 - 👥 **Мульти-пользователи** — легко добавлять новых пользователей
 - 🔄 **Автообновление** — Watchtower обновляет сервер автоматически
-- 📊 **Управление** — Outline Manager для администрирования
+- 📊 **Админ-панель** — управление через Telegram бота
 
 ## 🚀 Быстрая установка
+
+### 1. Установка Outline сервера
 
 ```bash
 # На сервере с Ubuntu/Debian
@@ -34,18 +41,51 @@ wget -qO- https://raw.githubusercontent.com/Jigsaw-Code/outline-server/master/sr
 1. **Ключ для Outline Manager** — JSON строка для управления сервером
 2. **Access Key** — ссылка `ss://...` для подключения клиентов
 
+### 2. Установка Telegram бота
+
+```bash
+cd bot
+
+# Создайте .env файл
+cat > .env << EOF
+BOT_TOKEN=ваш_токен_от_botfather
+ADMIN_ID=ваш_telegram_id
+OUTLINE_API_URL=https://ваш_сервер:порт/секрет
+EOF
+
+# Запустите
+docker-compose up -d --build
+```
+
+## 🤖 Telegram Bot
+
+Бот автоматически выдаёт VPN-ключи пользователям:
+
+**Для пользователей:**
+- `/start` — получить меню
+- 🔑 Получить ключ — создаёт персональный ключ + QR-код
+- 📱 Инструкции для iOS/Android/Windows/macOS
+
+**Для админа:**
+- ⚙️ Админ-панель — только для `ADMIN_ID`
+- 📊 Статистика — количество выданных ключей
+- 👥 Все ключи — список всех ключей
+- ➕ Создать / 🗑 Удалить ключи
+
 ## 📱 Клиенты
 
 ### Скачать Outline Client:
-- **iOS**: [App Store](https://apps.apple.com/app/outline-app/id1356177741)
-- **Android**: [Google Play](https://play.google.com/store/apps/details?id=org.outline.android.client)
-- **Windows**: [Download](https://raw.githubusercontent.com/Jigsaw-Code/outline-releases/master/client/Outline-Client.exe)
-- **macOS**: [Download](https://raw.githubusercontent.com/Jigsaw-Code/outline-releases/master/client/Outline-Client.dmg)
+| Платформа | Ссылка |
+|-----------|--------|
+| iOS | [App Store](https://apps.apple.com/app/outline-app/id1356177741) |
+| Android | [Google Play](https://play.google.com/store/apps/details?id=org.outline.android.client) |
+| Windows | [Download](https://raw.githubusercontent.com/Jigsaw-Code/outline-releases/master/client/Outline-Client.exe) |
+| macOS | [App Store](https://apps.apple.com/app/outline-app/id1356178125) |
 
 ### Подключение:
 1. Откройте Outline Client
 2. Нажмите "+" → "Добавить сервер"
-3. Вставьте ключ `ss://...`
+3. Вставьте ключ `ss://...` или отсканируйте QR
 4. Подключитесь!
 
 ## 🔧 Управление сервером
@@ -60,13 +100,17 @@ wget -qO- https://raw.githubusercontent.com/Jigsaw-Code/outline-server/master/sr
 # Статус контейнеров
 docker ps
 
-# Логи сервера
+# Логи Outline сервера
 docker logs shadowbox
+
+# Логи Telegram бота
+docker logs outline-bot
 
 # Перезапуск
 docker restart shadowbox
+docker restart outline-bot
 
-# Получить ключи через API
+# Получить API credentials
 cat /opt/outline/access.txt
 ```
 
